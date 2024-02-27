@@ -4,11 +4,10 @@ public class Synchronization_Issue_Fix {
 
 	public static int counter = 0;
 
-//we have to make sure this method is called only by a single thread at a given 
+//we have to make sure this method is executed only by a single thread at a given 
 	// time
-	public synchronized void increment() {
-		for (int i = 0; i < 100; i++)
-			counter++;
+	public static synchronized void increment() {
+		counter++;
 
 	}
 
@@ -18,15 +17,16 @@ public class Synchronization_Issue_Fix {
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
+
 				for (int i = 1; i <= 100; i++)
-					counter++;
+					increment();
 			}
 		});
 
 		Thread t2 = new Thread(() -> {
 
 			for (int i = 1; i <= 100; i++)
-				counter++;
+				increment();
 
 		});
 
