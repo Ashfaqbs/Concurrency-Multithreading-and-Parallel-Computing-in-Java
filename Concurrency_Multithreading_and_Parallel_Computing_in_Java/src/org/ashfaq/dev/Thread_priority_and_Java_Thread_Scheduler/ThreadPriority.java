@@ -1,4 +1,4 @@
-package Thread_priority_and_Java_Thread_Scheduler;
+package org.ashfaq.dev.Thread_priority_and_Java_Thread_Scheduler;
 
 import java.util.Iterator;
 
