@@ -1,7 +1,8 @@
 package org.ashfaq.dev.waitAndNotify;
 
 public class ProducerConsumerproblem {
-
+//whether its possible to communicate between the 2 threads and release the intrinsic lock and communicate between the 2 threads and the answer is 
+//	yes , and we have to use wait and notify
 	private void producer() {
 		// TODO Auto-generated method stub
 
@@ -19,6 +20,15 @@ public class ProducerConsumerproblem {
 
 			try {
 				wait();
+				// important as this a object(single object and threads are dependent as well
+				// )intrinsic lock, so lock will be released only when the thread completes its
+				// task and the other
+//				thread can acquire lock but once we call the wait the 1st thread which executed all the above logic before wait() will release the lock and other 
+//				thread will starts executing its by acquiring the lock and once the other threads which started executing only if calls it calls the notify()
+//				the 1st thread will run again so its like 1st T started executing its logic then went to wait condition as wait() was called the other 
+				// respective thread started executing its logic then called notify() so the 2st
+				// thread proceeded
+//
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
