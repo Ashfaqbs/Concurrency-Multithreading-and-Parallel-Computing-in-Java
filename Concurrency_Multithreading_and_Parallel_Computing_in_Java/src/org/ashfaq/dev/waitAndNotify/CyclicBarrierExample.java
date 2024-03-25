@@ -24,7 +24,7 @@ public class CyclicBarrierExample {
                 e.printStackTrace();
             }
         }
-    }
+    } 
 
     public static void main(String[] args) {
         final int totalThreads = 3;
