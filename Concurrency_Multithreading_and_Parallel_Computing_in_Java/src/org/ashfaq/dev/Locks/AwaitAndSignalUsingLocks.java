@@ -9,6 +9,11 @@ class Pr2 {
 	private Lock lock = new ReentrantLock();
 	private Condition condition = lock.newCondition();
 
+//	Intro
+//	since lock is smiliar to synchorization block there we used to use wait and notify as inter thread communication 
+//	but in locks we have to use await and signal methods which we can get from Condition class and the object is created from 
+//	providing a new condition from lock intance //	private Condition condition = lock.newCondition();
+
 	public void producer() throws InterruptedException {
 
 		lock.lock();
@@ -55,44 +60,42 @@ class Pr2 {
 		}
 
 	}
-	
+
 }
 
-	public class AwaitAndSignalUsingLocks {
+public class AwaitAndSignalUsingLocks {
 
-		public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) throws InterruptedException {
 
-			System.out.println("Starting the producer and consumer ");
-			Pr2 pp = new Pr2();
+		System.out.println("Starting the producer and consumer ");
+		Pr2 pp = new Pr2();
 
-			Thread t1 = new Thread(() -> {
-				try {
-					pp.producer();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			});
+		Thread t1 = new Thread(() -> {
+			try {
+				pp.producer();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
 
-			Thread t2 = new Thread(() -> {
-				try {
-					pp.consumer();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			});
+		Thread t2 = new Thread(() -> {
+			try {
+				pp.consumer();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
 
-			t1.start();
-			t2.start();
+		t1.start();
+		t2.start();
 
-			t1.join();
-			t2.join();
+		t1.join();
+		t2.join();
 
-			System.out.println(" the producer and consumer  is completed");
-
-		}
+		System.out.println(" the producer and consumer  is completed");
 
 	}
 
-
+}
