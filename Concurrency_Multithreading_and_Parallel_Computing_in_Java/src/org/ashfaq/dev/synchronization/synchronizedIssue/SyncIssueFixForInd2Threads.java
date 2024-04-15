@@ -47,7 +47,7 @@ public class SyncIssueFixForInd2Threads {
 	}
 
 	public static void main(String[] args) throws InterruptedException {
-		new SynchronizedIssueFixForInd2Threads().process();
+		new SyncIssueFixForInd2Threads().process();
 	}
 
 }
