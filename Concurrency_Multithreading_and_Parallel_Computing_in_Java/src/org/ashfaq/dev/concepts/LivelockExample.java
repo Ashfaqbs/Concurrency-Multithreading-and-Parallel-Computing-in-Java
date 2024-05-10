@@ -1,70 +1,76 @@
 package org.ashfaq.dev.concepts;
 
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 public class LivelockExample {
-    static class Spoon {
-        private Diner owner;
 
-        public Spoon(Diner d) {
-            owner = d;
-        }
+	private Lock lock1 = new ReentrantLock(true);
+	private Lock lock2 = new ReentrantLock(true);
 
-        public synchronized void use() {
-            System.out.println(owner.name + " is using the spoon.");
-        }
+	public static void main(String[] args) {
 
-        public synchronized void pass(Diner newOwner) {
-            System.out.println(owner.name + " passes the spoon to " + newOwner.name);
-            owner = newOwner;
-        }
-    }
+		LivelockExample livelock = new LivelockExample();
 
-    static class Diner {
-        private String name;
-        private boolean isHungry;
+		new Thread(livelock::worker1, "worker1").start();
+		new Thread(livelock::worker2, "worker2").start();
+	}
 
-        public Diner(String n) {
-            name = n;
-            isHungry = true;
-        }
+	private void worker1() {
 
-        public void eatWith(Spoon spoon, Diner spouse) {
-            while (isHungry) {
-                // Check if spouse is not hungry and pass the spoon
-                if (!spouse.isHungry) {
-                    try {
-                        Thread.sleep(100); // Simulating some work before passing the spoon
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    spoon.pass(spouse);
-                    continue;
-                }
-                // Simulate eating
-                spoon.use();
-                isHungry = false;
-                System.out.println(name + " is no longer hungry.");
-            }
-        }
-    }
+		while (true) {
 
-    public static void main(String[] args) {
-        final Diner husband = new Diner("Husband");
-        final Diner wife = new Diner("Wife");
+			try {
+				lock1.tryLock(50, TimeUnit.MILLISECONDS);
+				System.out.println("Worker1 acquires the lock1...");
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 
-        final Spoon sharedSpoon = new Spoon(husband);
+			System.out.println("Worker1 tries to get lock2...");
 
-        Thread husbandThread = new Thread(() -> husband.eatWith(sharedSpoon, wife));
-        Thread wifeThread = new Thread(() -> wife.eatWith(sharedSpoon, husband));
+			if (lock2.tryLock()) {
+				System.out.println("Worker1 acquires the lock2...");
+				lock2.unlock();
+			} else {
+				System.out.println("Worker1 can not acquire lock2...");
+				continue;
+			}
 
-        husbandThread.start();
-        wifeThread.start();
-    }
+			break;
+		}
+
+		lock1.unlock();
+		lock2.unlock();
+	}
+
+	private void worker2() {
+
+		while (true) {
+
+			try {
+				lock2.tryLock(50, TimeUnit.MILLISECONDS);
+				System.out.println("Worker2 acquires the lock2...");
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+			System.out.println("Worker2 tries to get lock1...");
+
+			if (lock1.tryLock()) {
+				System.out.println("Worker2 acquires the lock1...");
+				lock1.unlock();
+			} else {
+				System.out.println("Worker2 can not acquire lock1...");
+				continue;
+			}
+
+			break;
+		}
+
+		lock1.unlock();
+		lock2.unlock();
+	}
+
 }
-//
-//In this example, we have two diners (husband and wife) who are sharing a spoon (Spoon object). They alternate in 
-//using the spoon, but there's a condition that they pass the spoon to each other only when the other diner is not 
-//hungry. However, both diners are always hungry, so they keep passing the spoon back and forth without making progress
-//in eating. This situation demonstrates a livelock.
-//
-//When you run this program, you will see that the diners are passing the spoon continuously without making any 
-//progress in eating, indicating a livelock scenario
