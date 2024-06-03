@@ -22,6 +22,8 @@ public class SemaPhore2 {
 	 * 
 	 * 
 	 */
+	
+	//singelton design pattern
 
 	public enum Downloader {
 		INSTANCE;
