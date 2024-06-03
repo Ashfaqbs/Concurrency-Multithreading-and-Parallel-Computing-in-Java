@@ -37,11 +37,10 @@ public class SingleThreadExecutors {
 		ExecutorService newSingleThreadExecutor = Executors.newSingleThreadExecutor();
 		
 		//only one thread will take this and execute sequentely 
-		for(int i =0;i<5;i++)
+		for(int i =1;i<=20;i++)
 			newSingleThreadExecutor.submit(new Task(i));
 		
 		
-		//we have not yet shut down thes threads 
 		
 		
 	}
