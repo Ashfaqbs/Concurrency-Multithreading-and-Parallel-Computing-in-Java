@@ -174,6 +174,12 @@ public class CountDownLatchDemos {
          for (int i = 0; i < numberOfThreads; i++) {
              new Thread(new CountdownLatchExample(i, latch)).start();
          }
+         
+//         for every task done we have called latch.countDown(); so the count is decremented by 1 and if we see
+//        		 we have 5 tasks and 5 countdowns and once the task is done in run we can see we are calling it 
+//        		 and one all the task is done the count will be zero and we have to call .await() and next is
+//        		 the main thread will continue once this is completed this is similar to the join method but more 
+//        		 flexible.
 
          try {
              latch.await();
