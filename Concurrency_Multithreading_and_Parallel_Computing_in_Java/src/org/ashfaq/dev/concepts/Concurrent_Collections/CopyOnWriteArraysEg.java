@@ -87,6 +87,8 @@ public class CopyOnWriteArraysEg {
 		CopyOnWriteArraysEg arraysEg = new CopyOnWriteArraysEg();
 
 		arraysEg.stimulate();
+		
+		//copyonarrayList is faster then the vector impl
 
 	}
 }
