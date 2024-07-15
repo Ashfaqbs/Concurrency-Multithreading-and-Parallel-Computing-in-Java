@@ -24,6 +24,7 @@ class SimpleRecursiveAction extends RecursiveAction {
 		} else {
 
 			System.out.println("The task is rather  small so sequential execution is fine ...");
+			System.out.println("The size of the task " + simulateWork);
 		}
 	}
 
@@ -35,7 +36,9 @@ public class ForkJoinEg1 {
 
 		ForkJoinPool forkJoinPool = new ForkJoinPool();
 
-		System.out.println(Runtime.getRuntime().availableProcessors());
+//		System.out.println(Runtime.getRuntime().availableProcessors());
+		SimpleRecursiveAction action = new SimpleRecursiveAction(200);
+		action.invoke();
 
 	}
 
