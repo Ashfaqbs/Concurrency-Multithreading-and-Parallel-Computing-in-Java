@@ -1,6 +1,7 @@
 package org.ashfaq.dev.StreamAPI;
 
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -133,7 +134,26 @@ public class StreamObject {
 				.collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 //		System.out.println(collect2);
 
-		bookList.stream().filter(d -> d.getPageNo() > 500).map(Book::getTitle).forEach(System.out::println);
+//		bookList.stream().filter(d -> d.getPageNo() > 500).map(Book::getTitle).forEach(System.out::println);44
+
+//		**External Iterator** Vs Internal Iterator
+
+//		1 External Iterator
+		// inherently Sequential
+		// No Parallelism
+		Iterator<Book> iterator = bookList.iterator();
+
+		while (iterator.hasNext()) {
+			Book book = iterator.next();
+			System.out.println(book.getTitle());
+		}
+
+		// 2 Internal Iterator Stream
+		// inherently Parallel
+		// Parallelism
+		bookList.stream().map(Book::getTitle).forEach(System.out::println);
+
+		// Stream API is faster than Iterator
 
 	}
 
