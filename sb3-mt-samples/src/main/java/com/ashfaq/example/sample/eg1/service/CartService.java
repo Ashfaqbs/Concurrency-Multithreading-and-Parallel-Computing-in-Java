@@ -152,7 +152,10 @@ public class CartService {
 		String uploadId = uploadTracking.getUploadId();
 
 		// For each cart item, initiate an asynchronous update
-		carts.forEach(cart -> updateCartAsync(cart, uploadId));
+      	  carts.forEach(cart -> CompletableFuture.runAsync(() -> updateCartAsync(cart, uploadId), asyncExecutor)); 
+
+//		carts.forEach(cart -> updateCartAsync(cart, uploadId));
+
 
 		// Return the unique uploadId immediately
 		return uploadId;
