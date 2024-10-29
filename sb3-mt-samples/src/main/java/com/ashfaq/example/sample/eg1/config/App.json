@@ -1,0 +1,71 @@
+localhost:8080/api/carts/batch-update
+
+[
+    {
+        "id": 14,
+        "itemName": "Milk",
+        "price": 1.75,  // updated price
+        "category": "Dairy"
+    },
+    {
+        "id": 13,
+        "itemName": "Organic Eggs",  // updated name
+        "price": 3.50,
+        "category": "Poultry"
+    },
+    {
+        "id": 5,
+        "itemName": "Chicken Breast",  // updated name
+        "price": 5.25,
+        "category": "Meat"
+    },
+    {
+        "id": 11,
+        "itemName": "Green Apples",  // updated name
+        "price": 0.35,
+        "category": "Fruits"
+    },
+    {
+        "id": 12,
+        "itemName": "Fresh Orange Juice",  // updated name
+        "price": 2.75,  // updated price
+        "category": "Beverages"
+    }
+]
+
+
+
+localhost:8080/api/carts/mass-update
+
+[
+    {
+        "id": 14,
+        "itemName": "Milk",
+        "price": 1.75,  // updated price
+        "category": "Dairy"
+    },
+    {
+        "id": 13,
+        "itemName": "Organic Eggs",  // updated name
+        "price": 3.50,
+        "category": "Poultry"
+    },
+    {
+        "id": 5,
+        "itemName": "Chicken Breast",  // updated name
+        "price": 5.25,
+        "category": "Meat"
+    },
+    {
+        "id": 11,
+        "itemName": "Green Apples",  // updated name
+        "price": 0.35,
+        "category": "Fruits"
+    },
+    {
+        "id": 12,
+        "itemName": "Fresh Orange Juice",  // updated name
+        "price": 2.75,  // updated price
+        "category": "Beverages"
+    }
+]
