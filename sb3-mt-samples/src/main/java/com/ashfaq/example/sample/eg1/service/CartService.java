@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,9 +29,17 @@ public class CartService {
 	@Autowired
 	private CartRepository cartRepository;
 
-	@Autowired
-	private ExecutorService executorService;
+//	@Autowired
+//	private ExecutorService executorService;
 	// using ExecutorService and completable future to create massupdate
+	
+	
+
+	// true async passing asyncExecutor in completable future
+	// @Async("asyncExecutor") not required for true async on function level
+	@Autowired
+	@Qualifier("asyncExecutor")
+	private ExecutorService asyncExecutor;
 
 	@Autowired
 	private CartUploadRepository cartUploadRepository;
@@ -152,10 +160,9 @@ public class CartService {
 		String uploadId = uploadTracking.getUploadId();
 
 		// For each cart item, initiate an asynchronous update
-      	  carts.forEach(cart -> CompletableFuture.runAsync(() -> updateCartAsync(cart, uploadId), asyncExecutor)); 
+		carts.forEach(cart -> CompletableFuture.runAsync(() -> updateCartAsync(cart, uploadId), asyncExecutor));
 
 //		carts.forEach(cart -> updateCartAsync(cart, uploadId));
-
 
 		// Return the unique uploadId immediately
 		return uploadId;
@@ -200,7 +207,6 @@ public class CartService {
 		}
 	}
 
-	
 //	2. Mass update using ExecutorService and completable future
 
 //	 public String initiateMassUpdate(List<Cart> carts) {
