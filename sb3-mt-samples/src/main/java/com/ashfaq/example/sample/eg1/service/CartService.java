@@ -161,7 +161,7 @@ public class CartService {
 		return uploadId;
 	}
 
-	@Async("asyncExecutor")
+	// @Async("asyncExecutor") not required for true async
 	public CompletableFuture<Boolean> updateCartAsync(Cart cart, String uploadId) {
 		try {
 			// Perform the update operation for a single cart item
