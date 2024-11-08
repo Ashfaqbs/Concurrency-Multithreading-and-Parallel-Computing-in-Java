@@ -1,3 +1,32 @@
+# CompletableFuture What And Why : 
+
+## The main idea:
+
+1. **Runnable and Callable in ExecutorService:**
+   - **Runnable:** If we have a task that **doesn't need to return a result**, we use `Runnable`. It’s simply a piece of code that’s executed without returning anything.
+   - **Callable:** For tasks that **need to return a result**, `Callable` is preferred because it allows we to return a value or throw checked exceptions.
+   - **ExecutorService.submit()** can handle both `Runnable` and `Callable` tasks. If we submit a `Callable`, it returns a `Future`, which can be used to retrieve the result.
+
+2. **The Limitation of Future (Blocking Behavior):**
+   - When we use `Future` to get the result of a `Callable`, calling `.get()` on that `Future` **blocks the main thread** until the result is available.
+   - If we have multiple tasks and use a loop to call `.get()` on each `Future`, our program can end up waiting (blocking) on each result sequentially, which can be inefficient.
+
+3. **Non-Blocking with CompletableFuture:**
+   - `CompletableFuture` was introduced to address the **non-blocking** issue with `Future`.
+   - It allows we to start an asynchronous task and **chain further actions** without blocking. we don’t need to call `.get()` and block the thread waiting for the result.
+   - With `CompletableFuture`, we can use methods like `.thenApply()`, `.thenAccept()`, and `.thenCompose()` to **handle the result asynchronously**, enabling truly non-blocking execution.
+
+### Why CompletableFuture is Preferred:
+   - It **avoids blocking** by using callbacks (i.e., `thenApply`, `thenAccept`) that are triggered once the result is ready, allowing our code to continue executing other tasks.
+   - It simplifies **chaining tasks** or **combining results** from multiple asynchronous computations, which can get messy with `Future`.
+
+### Key Advantage Summary:
+   - **Runnable**: Use when there's no result expected.
+   - **Callable**: Use with `Future` for a result, but it’s blocking.
+   - **CompletableFuture**: Use for **non-blocking** execution when we need the result or further processing.
+
+
+
 
 # 0 
 ### `CompletableFuture` can work with an `ExecutorService` to control the thread pool used for its tasks. By default, if we use methods like `supplyAsync()` or `runAsync()` without specifying an executor, `CompletableFuture` uses the **ForkJoinPool.commonPool**, which is a shared pool of threads.
