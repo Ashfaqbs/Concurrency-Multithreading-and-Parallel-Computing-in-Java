@@ -20,4 +20,13 @@ public class PlanBatchController {
 		return ResponseEntity.ok(results);
 	}
 
+	@PostMapping("/threadbatch")
+	public String processBatchExecutorService(@RequestBody List<PlanRequest> planRequests) {
+		planService.processBatch(planRequests);
+		
+		return "Batch processing started";//we can return any upload entity UUId for trackng purpose as soon as i call the api the response will be returned
+		//and the processing will be done in background
+	}
+	
+
 }

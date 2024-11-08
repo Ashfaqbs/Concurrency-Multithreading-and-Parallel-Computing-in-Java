@@ -6,12 +6,14 @@ import java.util.List;
 //import java.util.ArrayList;
 //import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executor;
 
 //import org.apache.poi.ss.usermodel.Row;
 //import org.apache.poi.ss.usermodel.Sheet;
 //import org.apache.poi.ss.usermodel.Workbook;
 //import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 //import org.springframework.web.multipart.MultipartFile;
 
@@ -127,76 +129,88 @@ public class PlanService {
 		return results;
 	}
 
-//	Threading 
+//	type 2
 
-	// ExecutorService with a fixed pool of 10 threads
-//		private final ExecutorService executorService = Executors.newFixedThreadPool(10);
+	public boolean processRowAction(PlanRequest planRequest) {
+		boolean success = false;
 
-//	public void processExcelFileWithThreads(MultipartFile file) throws IOException {
-//		Workbook workbook = new XSSFWorkbook(file.getInputStream());
-//		Sheet sheet = workbook.getSheetAt(0);
-//		List<CompletableFuture<Void>> futures = new ArrayList<>();
-//
-//		for (Row row : sheet) {
-//			if (row.getRowNum() == 0)
-//				continue; // Skip header row
-//
-//			// Extract values from row
-//			String action = row.getCell(0).getStringCellValue();
-//			Long id = row.getCell(1) != null ? (long) row.getCell(1).getNumericCellValue() : null;
-//			String name = row.getCell(2) != null ? row.getCell(2).getStringCellValue() : null;
-//			String type = row.getCell(3) != null ? row.getCell(3).getStringCellValue() : null;
-//			String description = row.getCell(4) != null ? row.getCell(4).getStringCellValue() : null;
-//			Double cost = row.getCell(5) != null ? row.getCell(5).getNumericCellValue() : null;
-//
-//			// Create a task for each row based on action
-//			CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-//				processRowAction(action, id, name, type, description, cost);
-//			}, executorService);
-//
-//			futures.add(future);
-//		}
-//
-//		// Wait for all tasks to complete
-//		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-//		workbook.close();
-//	}
-//
-//	private void processRowAction(String action, Long id, String name, String type, String description, Double cost) {
-//		switch (action.toLowerCase()) {
-//		case "add":
-//			Plan newPlan = new Plan();
-//			newPlan.setName(name);
-//			newPlan.setType(type);
-//			newPlan.setDescription(description);
-//			newPlan.setCost(cost);
-//			planRepository.save(newPlan); // Reuse save for adding
-//			break;
-//
-//		case "update":
-//			if (id != null) {
-//				planRepository.findById(id).ifPresent(plan -> {
-//					if (name != null)
-//						plan.setName(name);
-//					if (type != null)
-//						plan.setType(type);
-//					if (description != null)
-//						plan.setDescription(description);
-//					if (cost != null)
-//						plan.setCost(cost);
-//					planRepository.save(plan); // Reuse save for updating
-//				});
-//			}
-//			break;
-//
-//		case "delete":
-//			if (id != null) {
-//				planRepository.deleteById(id); // Reuse deleteById for deleting
-//			}
-//			break;
-//
-//		default:
-//			throw new IllegalArgumentException("Invalid action: " + action);
-//		}
-//	}
+		try {
+			if ("create".equals(planRequest.getAction())) {
+				// Map PlanRequest to Plan for creating new Plan
+				Plan newPlan = mapPlanRequestToPlan(planRequest);
+				success = savePlan(newPlan); // Save new Plan
+			} else if ("update".equals(planRequest.getAction())) {
+				// Directly use the PlanRequest DTO for the update action
+				success = updatePlan(planRequest.getId(), planRequest); // Update Plan with the received DTO
+			} else if ("delete".equals(planRequest.getAction())) {
+				success = deletePlan(planRequest.getId()); // Delete Plan by ID
+			} else {
+				throw new RuntimeException("Invalid action: " + planRequest.getAction());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return success;
+	}
+
+	public boolean updatePlan(Long id, PlanRequest updatedPlanRequest) {
+		Optional<Plan> existingPlanOpt = planRepository.findById(id);
+
+		if (existingPlanOpt.isPresent()) {
+			Plan existingPlan = existingPlanOpt.get();
+
+			// Only update fields that are not null in the PlanRequest DTO
+			if (updatedPlanRequest.getName() != null)
+				existingPlan.setName(updatedPlanRequest.getName());
+			if (updatedPlanRequest.getType() != null)
+				existingPlan.setType(updatedPlanRequest.getType());
+			if (updatedPlanRequest.getDescription() != null)
+				existingPlan.setDescription(updatedPlanRequest.getDescription());
+			if (updatedPlanRequest.getCost() != null)
+				existingPlan.setCost(updatedPlanRequest.getCost());
+
+			planRepository.save(existingPlan); // Save the updated Plan
+			return true;
+		} else {
+			return false; // Plan not found
+		}
+	}
+
+	public Plan mapPlanRequestToPlan(PlanRequest planRequest) {
+		Plan plan = new Plan();
+		plan.setName(planRequest.getName());
+		plan.setType(planRequest.getType());
+		plan.setDescription(planRequest.getDescription());
+		plan.setCost(planRequest.getCost());
+		return plan;
+	}
+
+	@Autowired
+	@Qualifier("plantaskExecutor")
+	private Executor executor;
+
+	// Process the batch of PlanRequests using ExecutorService
+	public void processBatch(List<PlanRequest> planRequests) {
+		for (PlanRequest planRequest : planRequests) {
+			executor.execute(() -> {
+				boolean success = processRowAction(planRequest); // Process each planRequest
+				// Handle success/failure results here, log them, etc.
+				// auditing for main and child jobs will be done here
+				if (success) {
+
+					// Handle success logic (e.g., logging success, updating status, etc.)
+				} else {
+					// Handle failure logic (e.g., logging failure, sending failure notifications,
+					// etc.)
+				}
+			});
+		}
+	}
+
+//    The first 5 tasks will be handled by the 5 threads (since the core pool size is 5).
+//    After that, 15 more tasks will be processed concurrently, utilizing up to 15 more threads (since the max pool size is 20).
+//    If there are still tasks left (let's say 10), they will be placed in the queue.
+//    If the queue is full (100 tasks), and additional tasks come in, the calling thread will start processing them (because of CallerRunsPolicy).
+
 }
