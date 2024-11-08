@@ -38,7 +38,7 @@ public class CartService {
 	// true async passing asyncExecutor in completable future
 	// @Async("asyncExecutor") not required for true async on function level
 	@Autowired
-	@Qualifier("asyncExecutor")
+//	@Qualifier("asyncExecutor")
 	private ExecutorService asyncExecutor;
 
 	@Autowired
