@@ -213,4 +213,21 @@ public class PlanService {
 //    If there are still tasks left (let's say 10), they will be placed in the queue.
 //    If the queue is full (100 tasks), and additional tasks come in, the calling thread will start processing them (because of CallerRunsPolicy).
 
+	
+//same with completable future and executor service config as  we can Chaining of Dependent Tasks, Non-Blocking Callback Handling ......
+//	public CompletableFuture<Void> processBatchAsync(List<PlanRequest> planRequests) {
+//	    return CompletableFuture.allOf(
+//	        planRequests.stream()
+//	            .map(planRequest -> CompletableFuture.supplyAsync(() -> processRowAction(planRequest), executorService)
+//	                .thenAccept(success -> {
+//	                    if (success) {
+//	                        // Handle success logic here, such as logging or status update
+//	                    } else {
+//	                        // Handle failure logic here
+//	                    }
+//	                }))
+//	            .toArray(CompletableFuture[]::new)
+//	    );
+//	}
+
 }
