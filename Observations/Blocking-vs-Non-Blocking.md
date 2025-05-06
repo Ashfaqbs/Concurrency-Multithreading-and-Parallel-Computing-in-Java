@@ -39,3 +39,86 @@ So yeah—blocking wasn’t *only* about I/O. It’s really any case where a thr
 * **Non-blocking**: Thread doesn’t wait. It moves on and comes back to the task when the result is ready.
 * Most blocking is seen during **external operations**, but it also happens with **internal waits or locks**.
 * It’s more about **how the thread behaves** than whether the code is async or sync.
+
+
+
+
+
+
+
+
+A practical code example to the doc, showing both blocking and non-blocking approaches using Java and an external HTTP API call :
+
+* **Blocking version**: `HttpURLConnection`
+* **Non-blocking version**: `WebClient` from Spring WebFlux (reactive)
+---
+
+### 5. Code Example – Blocking vs Non-Blocking with External API Call
+
+We wanted to see this concept with real Java code—where we’re making a call to an external system (say a public HTTP API like `https://jsonplaceholder.typicode.com/todos/1`) and observing the thread behavior.
+
+---
+
+#### 5.1 Blocking Example using `HttpURLConnection`
+
+```java
+public class BlockingHttpExample {
+    public static void main(String[] args) throws Exception {
+        long startTime = System.currentTimeMillis();
+
+        System.out.println("Blocking call started on thread: " + Thread.currentThread().getName());
+
+        URL url = new URL("https://jsonplaceholder.typicode.com/todos/1");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+            String inputLine;
+            StringBuilder content = new StringBuilder();
+            while ((inputLine = in.readLine()) != null) {
+                content.append(inputLine);
+            }
+            System.out.println("Response: " + content);
+        }
+
+        long duration = System.currentTimeMillis() - startTime;
+        System.out.println("Blocking call completed in " + duration + " ms");
+    }
+}
+```
+
+🔹 This example is **completely blocking**—until the HTTP response is fetched, the thread does nothing else.
+
+---
+
+#### 5.2 Non-Blocking Example using `WebClient` (Spring WebFlux)
+
+```java
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+
+public class NonBlockingHttpExample {
+    public static void main(String[] args) {
+        WebClient client = WebClient.create("https://jsonplaceholder.typicode.com");
+
+        System.out.println("Non-blocking call triggered on thread: " + Thread.currentThread().getName());
+
+        Mono<String> responseMono = client.get()
+                .uri("/todos/1")
+                .retrieve()
+                .bodyToMono(String.class);
+
+        responseMono.subscribe(response -> {
+            System.out.println("Response received on thread: " + Thread.currentThread().getName());
+            System.out.println("Response: " + response);
+        });
+
+        System.out.println("Main thread continues without waiting...");
+        
+        // Optional delay so the app doesn't exit immediately before async completes
+        try { Thread.sleep(3000); } catch (InterruptedException e) {}
+    }
+}
+```
+
+🔹 This is **non-blocking**—the call is made, and the main thread **continues immediately**. When the response is ready, it is handled via a **callback** (`subscribe`).
