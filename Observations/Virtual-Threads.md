@@ -1,4 +1,18 @@
-## Java Virtual Threads - Deep Understanding (Reference Document)
+## Java Virtual Threads - Deep Understanding
+
+---
+- My Understanding  
+
+```
+After the introduction of Virtual Threads in Java, the JVM gained an internal scheduler to manage them.
+Before Virtual Threads, Java threads were simply OS threads — tightly coupled — and after Virtual Threads were introduced, these traditional threads were named **Platform Threads** (1:1 mapping with OS threads).
+
+Virtual Threads, on the other hand, are lightweight threads that are not tightly coupled to OS threads. Many Virtual Threads can share (be multiplexed over) a small pool of OS threads.
+
+When a Virtual Thread performs blocking operations (such as calling an API or performing IO), it does not hold up an OS thread. Instead, the Virtual Thread is parked by the JVM scheduler, freeing the OS thread to run other Virtual Threads.
+
+This model is efficient and scales well but is still based on blocking code style — it is not truly non-blocking like event-loop-based models (such as WebFlux). Virtual Threads make blocking operations much cheaper but they are not designed to be fully non-blocking.
+```
 
 ---
 
